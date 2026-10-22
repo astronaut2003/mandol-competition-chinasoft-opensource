@@ -37,3 +37,9 @@
 `auth.py`、`access.py`、`migrations.py` 维护账号、Argon2id、Cookie Session、CSRF、角色、配额和正式迁移。账号→Workspace→Conversation/Memory/Attachment/Repository/Job 的范围由服务端验证，管理员账户管理权不授予私有聊天读取权。
 
 `semantic_schema.py` 将系统能力与当前范围实例统计分开。`visualization.py`、`memory_quality.py` 使用共享有效性和保守视图聚合；不改变实际 Memory UID。来源图与语义关系图分开，聚合展开仍能定位全部真实成员和已存边。
+
+## 推理部署边界
+
+Web 环境与两个 vLLM 环境各有独立锁文件。Dense/SPLADE 使用 vLLM 0.29.0，BGE 使用 0.25.1；模型权重从指定官方 revision 获取并校验。启动清单与实际 vLLM 配置共同形成元信息，正式客户端再用真实 HTTP 推理验证就绪。缓存布局、进程地址与 GPU 预算不改变模型数值 Profile。
+
+原生应用和 Linux host-network 应用容器均可访问同一组显式配置的回环 GPU 服务。SQLite 与 Qdrant 继续由每个应用部署独立持有；推理服务不持有用户数据或记忆索引。

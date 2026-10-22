@@ -1,0 +1,17 @@
+# Linux only: app and GPU HTTP services share the host loopback namespace.
+# The app still binds 127.0.0.1; Qdrant remains in its project bridge/volume.
+services:
+  app:
+    network_mode: host
+    ports: !reset []
+    extra_hosts: !reset []
+    environment:
+      CHINASOFT_HOST: 127.0.0.1
+      CHINASOFT_PORT: "${CHINASOFT_PORT:-20600}"
+      CHINASOFT_QDRANT_URL: "http://127.0.0.1:${MANDOL_QDRANT_PORT:-20633}"
+      CHINASOFT_EMBEDDING_BASE_URL: "${CHINASOFT_EMBEDDING_BASE_URL:-http://127.0.0.1:20631/v1}"
+      CHINASOFT_SPLADE_URL: "${CHINASOFT_SPLADE_URL:-http://127.0.0.1:20636}"
+      CHINASOFT_RERANKER_BASE_URL: "${CHINASOFT_RERANKER_BASE_URL:-http://127.0.0.1:20632}"
+    command: ["uvicorn", "mandol_competition.chinasoft.api:create_app", "--factory", "--host", "127.0.0.1", "--port", "${CHINASOFT_PORT:-20600}", "--workers", "1", "--no-access-log", "--timeout-graceful-shutdown", "90"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:'+os.environ['CHINASOFT_PORT']+'/healthz',timeout=3)"]

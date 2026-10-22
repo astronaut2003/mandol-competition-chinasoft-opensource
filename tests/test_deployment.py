@@ -22,6 +22,14 @@ def test_explicit_environment_wins_without_reading_private_config():
  result=subprocess.run(['bash','-c','source scripts/_common.sh; printf "%s" "$CHINASOFT_PORT"'],cwd=ROOT,env={**os.environ,'CHINASOFT_PORT':'20777'},text=True,capture_output=True,check=True)
  assert result.stdout=='20777'
 
+def test_explicit_hub_credential_wins_over_blank_template(tmp_path):
+ import shutil
+ (tmp_path/'scripts').mkdir()
+ shutil.copyfile(ROOT/'scripts/_common.sh',tmp_path/'scripts/_common.sh')
+ (tmp_path/'.env').write_text('HF_TOKEN=\n')
+ # Synthetic credential only; check precedence without printing credentials.
+ subprocess.run(['bash','-c','source scripts/_common.sh; test "$HF_TOKEN" = synthetic-process-credential'],cwd=tmp_path,env={**os.environ,'HF_TOKEN':'synthetic-process-credential'},check=True)
+
 
 def test_public_demo_contains_only_fresh_synthetic_sources(tmp_path):
  from mandol_competition.chinasoft.config import Settings

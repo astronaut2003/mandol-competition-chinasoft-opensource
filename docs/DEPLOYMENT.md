@@ -4,7 +4,7 @@
 
 本机方式使用项目自己的 `.venv`、`studio/node_modules`、`data/native` 和 Compose Qdrant 卷。容器方式把 API、内置 Worker 和已构建前端放入应用容器，SQLite 与上传存储在 `app_data` 卷。两种方式不读取其他工程的环境、数据库或虚拟环境。
 
-默认应用 20600，Qdrant 20633，模型 20631/20636/20632。监听地址为回环；没有自动开放公网或初始化固定密码的步骤。原有 186xx/196xx 本机部署端口受启动脚本保护。
+默认应用 20600，Qdrant 20633，模型 20631/20636/20632。监听地址为回环；没有自动开放公网或初始化固定密码的步骤。启动脚本会拒绝接管不属于本工程的监听进程。
 
 ## 系统准备
 
@@ -74,14 +74,18 @@ docker compose -p mandol-os-native up -d qdrant
 
 模式 A：连接已有的、被明确配置的独立 HTTP 端点。必须满足 `docs/INFERENCE.md` 中的模型 revision、数值配方、元信息与鉴权协议。普通 vLLM `/health` 成功不代表兼容；需要 `/mandol/metadata` 和真实推理探测。
 
-模式 B：显式安装本地 vLLM 环境、下载授权模型，再启动。当前全新安装发现 0.29.0 公共包依赖冲突，步骤会停止并报告原因；本轮未将它标记为本机 GPU 通过。不要在未知的 CUDA/torch 组合上使用 `--no-deps` 隐藏问题。
+模式 B：使用各自的哈希锁文件安装独立 vLLM 环境，下载指定 revision 并校验实际文件内容，再启动。安装器通过 `--no-config` 隔离 Web workspace 的 protobuf 约束，保留完整依赖检查。SPLADE-v3 需要在官方模型页接受访问条款并注入授权 `HF_TOKEN`。安装、下载和真实验证细节见 [GPU 部署](INFERENCE.md)。
 
 ```bash
 ./scripts/inference-setup.sh
 ./scripts/download-models.sh
-# 按实际资源编辑 .env 的 *_MANAGED、*_GPU、*_GPU_MEMORY 等
+# 按实际资源编辑 .env 的 *_GPU、*_GPU_MEMORY 等
+export CHINASOFT_DENSE_MANAGED=true
+export CHINASOFT_SPARSE_MANAGED=true
+export CHINASOFT_RERANKER_MANAGED=true
 ./scripts/inference-start.sh
 ./scripts/inference-status.sh
+.venv/bin/python scripts/verify-gpu.py
 ./scripts/start.sh
 ```
 
@@ -103,7 +107,14 @@ curl --fail http://127.0.0.1:20600/healthz
 
 镜像以非 root 用户运行。应用 API 同时提供前端静态文件和内置 Worker。Qdrant 在独立网络与独立命名卷中运行；应用使用内部 `http://qdrant:6333`。本机与容器的 SQLite 不共用。
 
-配置容器 GPU 端点时使用 `CHINASOFT_CONTAINER_DENSE_URL`、`CHINASOFT_CONTAINER_SPARSE_URL` 和 `CHINASOFT_CONTAINER_RERANKER_URL`。Linux bridge 不能访问宿主机仅绑定 127.0.0.1 的服务；可选择独立远端服务，或改用本机应用模式。不要为了连通模型直接把端口开放给公网。
+配置容器 GPU 端点时使用 `CHINASOFT_CONTAINER_DENSE_URL`、`CHINASOFT_CONTAINER_SPARSE_URL` 和 `CHINASOFT_CONTAINER_RERANKER_URL`。Linux bridge 不能访问宿主机仅绑定 127.0.0.1 的服务。使用远端可达地址，或为本机 GPU 使用以下 Linux overlay，应用仍只监听回环：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.loopback.yml -p mandol-os-compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.loopback.yml -p mandol-os-compose exec app python -m mandol_competition.chinasoft.admin create-admin --username admin
+```
+
+更改端口时通过环境设置 `CHINASOFT_PORT`、`MANDOL_QDRANT_PORT`；本机和容器部署不应同时占用同一组端口。此 overlay 不启动模型容器，使用已独立验证的本机 GPU 服务。不要为了连通模型把端口开放给公网。
 
 基础容器检查需要显式设置 `CHINASOFT_ALLOW_RETRIEVAL_DEGRADED=true`。容器 HTTP Health 只证明 API 和 SQLite 可访问，完整模型就绪状态以登录后的系统状态和真实查询为准。
 

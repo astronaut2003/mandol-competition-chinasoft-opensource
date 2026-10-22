@@ -31,7 +31,7 @@ def deployment(channel):
         raise ValueError('Managed services require an explicit loopback origin; use MANAGED=false for remote endpoints')
     version='025' if channel=='reranker' else '029'
     python=Path(env(prefix+'_VLLM_PYTHON',ROOT/('.venv-vllm-'+version)/'bin/python'))
-    cache=Path(env('MODEL_CACHE',ROOT/'data/models/hub'))
+    cache=Path(env('MODEL_CACHE',ROOT/'data/models/hub')).expanduser().resolve()
     return {'managed':managed,'endpoint':url,'gpu':device,'gpu_memory':fraction,'max_seqs':seqs,
             'max_batched_tokens':batched,'python':str(python),'cache':str(cache),'recipe_hash':recipe_hash(channel)}
 
@@ -75,6 +75,11 @@ def preflight(channels):
         required=demands.get(g['index'],0)
         if required and required+2048>g['free_mib']:
             raise RuntimeError(f"GPU {g['index']}: free {g['free_mib']} MiB, declared new budgets {required:.0f} MiB + 2048 MiB reserve. No service was stopped. Choose another GPU/remote endpoint or lower bounded GPU_MEMORY/MAX_SEQS budgets; do not terminate unrelated services.")
+    # Resource diagnostics precede downloads; all selected artifacts must still
+    # pass before allocating any new GPU process.
+    for channel in channels:
+        d=deployment(channel)
+        if d['managed'] and not owned(channel):verify_artifact(d['cache'],channel)
     return gpus
 
 
@@ -179,9 +184,19 @@ def main():
         channels=[args.channel] if args.channel else list(MODELS)
         if args.action=='start':
             before=preflight(channels);result=[]
-            for c in channels:
-                began=time.monotonic();r=start_one(c);r['seconds']=round(time.monotonic()-began,3);result.append(r)
-                print(json.dumps(r),flush=True)
+            created=[]
+            try:
+                for c in channels:
+                    if deployment(c)['managed'] and not owned(c):created.append(c)
+                    began=time.monotonic();r=start_one(c);r['seconds']=round(time.monotonic()-began,3);result.append(r)
+                    print(json.dumps(r),flush=True)
+            except Exception:
+                # Roll back only this attempt's new processes. Previously running
+                # owned services and every unowned listener remain untouched.
+                for c in reversed(created):
+                    try:stop_one(c)
+                    except RuntimeError:print('Cleanup could not verify/stop '+c+'; inspect its owned log.',file=sys.stderr)
+                raise
             (RUN/'startup.json').write_text(json.dumps({'services':result,'gpu_before':before,'gpu_after':gpu_info()},indent=2))
         elif args.action=='stop':
             for c in reversed(channels):stop_one(c)

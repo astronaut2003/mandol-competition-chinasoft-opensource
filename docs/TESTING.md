@@ -38,3 +38,32 @@ MANDOL_E2E_USERNAME=<你的账号> MANDOL_E2E_PASSWORD_FILE=<0600密码文件> n
 浏览器使用真实静态前端和后端，创建自己的合成会话。结果和截图存放 `.release-private/`，不会进入公开提交。完整生命周期、来源、权限、远程仓库安全、联网参数和推理模式已有测试；其中模型/网络 Mock 是协议验证，不作为真实外部服务成功。
 
 本轮外部凭据与 GPU 安装状态在内部验收报告中逐项给出。仓库不公开该凭据、真实运行数据库、逐用户日志或内部报告。
+
+## 真实 GPU 与 Agent 闭环
+
+三个服务启动后执行正式 HTTP 客户端测试：
+
+```bash
+.venv/bin/python scripts/verify-gpu.py --samples 12 --output .release-private/gpu-http.json
+```
+
+默认必须三个通道全部通过。`--channel dense` 等选项仅用于逐通道诊断，单通道 PASS 不代表完整检索。结果包含实际 metadata、批量与重复误差、稀疏非零数量、BGE 排序，以及顺序/并发 2 的原始测量和 P50/P95。
+
+进一步在模型环境中加载同一份固定权重，用 Transformers CUDA 运算对照真实 HTTP 输出，核对 LAST + normalize、全 token SPLADE pooling 和 BGE sigmoid：
+
+```bash
+.venv-vllm-029/bin/python scripts/verify-model-reference.py --channel dense --output .release-private/dense-reference.json
+.venv-vllm-029/bin/python scripts/verify-model-reference.py --channel sparse --output .release-private/sparse-reference.json
+.venv-vllm-025/bin/python scripts/verify-model-reference.py --channel reranker --output .release-private/bge-reference.json
+```
+
+这一步在独立验证进程中临时加载一份模型，需为参考运算额外预留 GPU 显存；FastAPI 仍只通过 HTTP 调用模型。
+
+完整服务与 DeepSeek 就绪后，在新建的合成工作区执行真实保存、索引、高阶构建、跨会话三路召回、RRF、BGE、Agent 引用、幂等重放及来源修订：
+
+```bash
+.venv/bin/python examples/full_retrieval.py --username admin \
+  --password-file /secure/password.txt --output .release-private/full-retrieval.json
+```
+
+该示例保留自己的工作区用于查看结果，不清理已有账号数据。服务或配方不合格会失败，不能把基础模式的词法召回当作三路成功。重启检查应比较原工作区与 Source UID，再执行真实查询；不要用重新生成数据代替持久化验证。

@@ -8,7 +8,7 @@ export PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 # Explicit process environment wins over the local file, including credentials.
 declare -A MANDOL_CALLER_ENV=()
 while IFS= read -r MANDOL_ENV_NAME; do
-  case "$MANDOL_ENV_NAME" in CHINASOFT_*|DEEPSEEK_API_KEY|MANDOL_*) MANDOL_CALLER_ENV["$MANDOL_ENV_NAME"]="${!MANDOL_ENV_NAME}";; esac
+  case "$MANDOL_ENV_NAME" in CHINASOFT_*|DEEPSEEK_API_KEY|MANDOL_*|HF_TOKEN|HF_HUB_DISABLE_XET) MANDOL_CALLER_ENV["$MANDOL_ENV_NAME"]="${!MANDOL_ENV_NAME}";; esac
 done < <(compgen -e)
 if [[ -f .env ]]; then set -a; source .env; set +a; fi
 for MANDOL_ENV_NAME in "${!MANDOL_CALLER_ENV[@]}"; do export "$MANDOL_ENV_NAME=${MANDOL_CALLER_ENV[$MANDOL_ENV_NAME]}"; done

@@ -48,14 +48,14 @@ def cache_snapshot(cache, channel):
 
 
 def verify_artifact(cache, channel):
-    """Verify cached weight content against the HF content-addressed blob name."""
+    """Verify actual weight bytes; Hub cache names may be opaque Xet IDs."""
     path = cache_snapshot(cache, channel)
     m = MODELS[channel]
     weight = path/m['weights']
     with weight.open('rb') as f:
         sha = hashlib.file_digest(f, 'sha256').hexdigest()
-    if weight.resolve().name != sha or sha != m['weights_sha256']:
-        raise ValueError('Cached weights are not the pinned content-addressed HF blob: ' + channel)
+    if sha != m['weights_sha256']:
+        raise ValueError('Cached weight bytes differ from the pinned SHA256: ' + channel)
     names = ['config.json', 'tokenizer.json', 'tokenizer_config.json']
     files = {n: hashlib.sha256((path/n).read_bytes()).hexdigest() for n in names}
     return {'model': m['model'], 'revision': m['revision'], 'weights_sha256': sha, **files}

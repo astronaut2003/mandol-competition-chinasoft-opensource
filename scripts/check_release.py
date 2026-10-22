@@ -7,11 +7,14 @@ before reading. Gitleaks/history checks should be run separately before release.
 from pathlib import Path
 import argparse,hashlib,json,os,re,subprocess,sys
 ROOT=Path(__file__).resolve().parents[1]
-ROOT_FILES={'README.md','LICENSE','NOTICE','THIRD_PARTY_NOTICES.md','pyproject.toml','uv.lock','.gitignore','.dockerignore','.gitleaks.toml','.env.example','Dockerfile','docker-compose.yml'}
+ROOT_FILES={'README.md','README_EN.md','LICENSE','NOTICE','THIRD_PARTY_NOTICES.md','pyproject.toml','uv.lock','.gitignore','.dockerignore','.gitleaks.toml','.env.example','Dockerfile','docker-compose.yml','docker-compose.loopback.yml'}
 DIRS=('src','packages/substrate','studio','scripts','services','docs','tests','examples','demo','deploy')
 EXCLUDE={'__pycache__','node_modules','dist','build','.pytest_cache','.cache','.venv','.release-private','test-results','playwright-report'}
-SUFFIXES={'.py','.pyi','.ts','.tsx','.js','.mjs','.css','.html','.json','.toml','.lock','.md','.txt','.sh','.yml','.yaml','.svg','.cfg','.ini','.mts'}
+SUFFIXES={'.py','.pyi','.ts','.tsx','.js','.mjs','.css','.html','.json','.toml','.lock','.md','.txt','.sh','.yml','.yaml','.svg','.cfg','.ini','.mts','.in'}
 SPECIAL={'LICENSE','NOTICE','.gitignore','README.txt','py.typed'}
+REVIEWED_IMAGES={'demo/status_board.png','docs/assets/studio-conversation.png',
+                 'docs/assets/memory-provenance.png','docs/assets/repository-symbols.png',
+                 'docs/assets/retrieval-trace.png'}
 
 def files():
  values=[ROOT/name for name in ROOT_FILES if (ROOT/name).is_file()]
@@ -38,7 +41,7 @@ def audit(values):
  for p in values:
   name=p.relative_to(ROOT).as_posix()
   if p.is_symlink():findings.append({'file':name,'rule':'symlink'});continue
-  data=p.read_bytes();allowed_image=name=='demo/status_board.png'
+  data=p.read_bytes();allowed_image=name in REVIEWED_IMAGES
   if p.suffix not in SUFFIXES and p.name not in SPECIAL and name not in ROOT_FILES and not allowed_image:findings.append({'file':name,'rule':'unreviewed_file_type'})
   if p.stat().st_size>2*1024*1024:findings.append({'file':name,'rule':'unexpected_large_file'})
   if not allowed_image:

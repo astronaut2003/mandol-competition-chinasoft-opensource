@@ -10,9 +10,9 @@
 | 没有账号 | 先 setup，再用 `scripts/admin.sh create-admin --username admin`；无默认密码 |
 | 注册后无法登录 | 默认需要审批；检查注册开关和 REGISTRATION_APPROVAL，不要修改数据库密码字段 |
 | GPU 不可见 | 检查 `nvidia-smi`、驱动及所选 GPU；应用本身不加载 CUDA 权重 |
-| vLLM 安装冲突 | 当前 0.29.0 的 protobuf 与 CUTLASS DSL 依赖冲突会使新环境解析失败；保留错误，使用已兼容的独立端点，不能静默换模型或跳过依赖 |
+| vLLM 安装冲突 | 先确认使用本仓库 inference-setup；其 --no-config 防止 Web workspace 的 protobuf 约束泄漏，使用完整 hash lock 和 pip check；不要从根目录直接 uv pip install 到模型环境 |
 | CUDA/torch/vLLM 版本不兼容 | 模型环境与 Web 环境隔离；核对 INFERENCE.md 的精确数值配方与版本，不共用其他项目虚拟环境 |
-| 模型下载失败 | 检查网络、许可与可用空间；可显式配置公开共享缓存，下载中断后按同一 revision 续传 |
+| 模型下载失败 | 检查网络、许可与可用空间；SPLADE 401 需要在官方模型页接受访问条款并显式设置 HF_TOKEN；只使用授权缓存，按固定 revision 续传 |
 | 服务 /health 成功但模型未就绪 | 检查 `/mandol/metadata`、artifact hashes、版本、pooling、真实编码与排序；普通 OpenAI 兼容端点不自动符合本协议 |
 | 缺少 Dense/SPLADE/BGE | 完整 start 会拒绝；基础检查需显式 --basic。SPLADE 的词法降级不等于真实 SPLADE 成功 |
 | 容器连接不到本机模型 | host-gateway 不能访问只绑定 127.0.0.1 的服务；使用本机 API 或独立远端端点，保留访问控制 |
