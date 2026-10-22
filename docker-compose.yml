@@ -1,0 +1,57 @@
+name: mandol-os-compose
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.19.1
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MANDOL_QDRANT_PORT:-20633}:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__TELEMETRY_DISABLED: "true"
+      QDRANT__LOG_LEVEL: WARN
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/6333; printf \"GET /readyz HTTP/1.0\\r\\n\\r\\n\" >&3; read -r line <&3; [[ $$line == *\" 200 \"* ]]'"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 10s
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mandol-agent-memory:local
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${CHINASOFT_PORT:-20600}:20600"
+    env_file:
+      - .env
+    environment:
+      DEEPSEEK_API_KEY: "${DEEPSEEK_API_KEY:-}"
+      CHINASOFT_HOST: 0.0.0.0
+      CHINASOFT_PORT: "20600"
+      CHINASOFT_DATA_DIR: /app/data
+      CHINASOFT_QDRANT_URL: http://qdrant:6333
+      CHINASOFT_STUDIO_DIST: /app/studio/dist
+      CHINASOFT_ALLOW_RETRIEVAL_DEGRADED: "${CHINASOFT_ALLOW_RETRIEVAL_DEGRADED:-false}"
+      CHINASOFT_EMBEDDING_BASE_URL: "${CHINASOFT_CONTAINER_DENSE_URL:-http://host.docker.internal:20631/v1}"
+      CHINASOFT_SPLADE_URL: "${CHINASOFT_CONTAINER_SPARSE_URL:-http://host.docker.internal:20636}"
+      CHINASOFT_RERANKER_BASE_URL: "${CHINASOFT_CONTAINER_RERANKER_URL:-http://host.docker.internal:20632}"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - app_data:/app/data
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:20600/healthz',timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    stop_grace_period: 120s
+volumes:
+  app_data:
+  qdrant_data:

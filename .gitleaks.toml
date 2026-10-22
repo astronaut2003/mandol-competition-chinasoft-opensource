@@ -1,0 +1,13 @@
+# Keep the default secret rules. These reviewed exact strings are non-secrets:
+# a public tokenizer SHA256, a recipe label, and an intentional upload rejection fixture.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Reviewed public artifact identity and synthetic rejection values"
+regexTarget = "secret"
+regexes = [
+  '''^2fc687b11de0bc1b3d8348f92e3b49ef1089a621506c7661fbf3248fcd54947e$''',
+  '''^chinasoft-generation-v1$''',
+  '''^secret1234567890$''',
+]

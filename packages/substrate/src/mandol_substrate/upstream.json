@@ -1,0 +1,94 @@
+{
+  "repository": "Mandol-competition-textual",
+  "commit": "f92792e22e15fe7705a7c3361f9897ae61fd4a8d",
+  "files": {
+    "state/__init__.py": {
+      "source": "src/mandol/storage/state/__init__.py",
+      "sha256": "d3f291bfd8d4e976dae7bfa60e80e773362bca1b93a2c14a22e5a3a55881e5de"
+    },
+    "state/interface.py": {
+      "source": "src/mandol/storage/state/interface.py",
+      "sha256": "35777e9d7405466d38ba127c667052d41ecb3744d265405e02506cda121ea872"
+    },
+    "state/models.py": {
+      "source": "src/mandol/storage/state/models.py",
+      "sha256": "80d223f5be23772262677c43be7e283503ee0662c001aad35175f9c4c626556a"
+    },
+    "state/sqlite_store.py": {
+      "source": "src/mandol/storage/state/sqlite_store.py",
+      "sha256": "5fe3e07ce955ed6e29b85e4fe81b0265c598c19e4c9af1703617224a5088b39b"
+    },
+    "state/migrations.py": {
+      "source": "src/mandol/storage/state/migrations.py",
+      "sha256": "85144d49e3f8576811be4d5523b4389af18a27ada891a24627de9f13b4ff8f0f"
+    },
+    "state/schema.py": {
+      "source": "src/mandol/storage/state/schema.py",
+      "sha256": "46db732ef8eb61881708ee9b75c365f85065b4b5bbd7515bc083c2b749e96df8"
+    },
+    "lexical/__init__.py": {
+      "source": "src/mandol/storage/lexical/__init__.py",
+      "sha256": "e19acf8c9902409f63252e7a7641be9d65e2d6f5d8444e786fc66b2f01df7e9e"
+    },
+    "lexical/sqlite_exact.py": {
+      "source": "src/mandol/storage/lexical/sqlite_exact.py",
+      "sha256": "8746d77460d508d0b731e6dd2e26d079caed42dadbc74f7609b3dae53f89b91c"
+    },
+    "lexical/interface.py": {
+      "source": "src/mandol/storage/lexical/interface.py",
+      "sha256": "a72a12a12df58dcf931bf476e317171ee2347ff8cac63486dca194283ad2b610"
+    },
+    "vector/__init__.py": {
+      "source": "src/mandol/storage/vector/__init__.py",
+      "sha256": "7c2643358c7d3172f489a2f69312ff769bfe0a26866c7820aeae937071e84d78"
+    },
+    "vector/interface.py": {
+      "source": "src/mandol/storage/vector/interface.py",
+      "sha256": "3b740a898bd4608e3d01eed5fe005b2f50a8044bebafd3c7f33f61deb003a566"
+    },
+    "vector/verification.py": {
+      "source": "src/mandol/storage/vector/verification.py",
+      "sha256": "5b655df09599f12e1409cfcd743054484991a50fb317f83908831e71e350ab09"
+    },
+    "vector/codec.py": {
+      "source": "src/mandol/storage/vector/codec.py",
+      "sha256": "39a22cb01ca8e21ddb303346d57b7f4ad59b901fa4c6de23d222acb754e4d7ac"
+    },
+    "qdrant/__init__.py": {
+      "source": "src/mandol/storage/qdrant/__init__.py",
+      "sha256": "49b8221ba8602ead98e9396d3e70b98a6436855fe3c139120720c221f61f1212"
+    },
+    "qdrant/policy.py": {
+      "source": "src/mandol/storage/qdrant/policy.py",
+      "sha256": "50785aa916f29f827fe6d5db438e6af22c6a9c26e5166ba449de3ad0c6c2f6e9"
+    },
+    "qdrant/backend.py": {
+      "source": "src/mandol/storage/qdrant/backend.py",
+      "sha256": "8e9a0781e546b8839999f80b8ea178159563647b70f717ddaea65019034b73ee"
+    },
+    "qdrant/service.py": {
+      "source": "src/mandol/storage/qdrant/service.py",
+      "sha256": "446a6a87f7b87e5064b404353a4c982f91bd5c6771ed4a90d0f6fbe8c7304e03"
+    },
+    "publication.py": {
+      "source": "src/mandol/competition/publication.py",
+      "sha256": "3ca0835f3d9903a947939c580acb23ab5c638930dc8af7391f4f0cbcda973be5"
+    },
+    "gates.py": {
+      "source": "src/mandol/competition/gates.py",
+      "sha256": "fd4b5024123464eade905cf86454f4c31b67a0561f5689926add169757092bed"
+    },
+    "text.py": {
+      "source": "src/mandol/competition/text.py",
+      "sha256": "30ad71f33907a1cf683d462401b32a40d1f865adbf90fe1d65f4859dc63303ef"
+    },
+    "splade.py": {
+      "source": "src/mandol/competition/splade.py",
+      "sha256": "9899fc4163818b18e8e9d7657f4449662e545c955c63d294671ced66b7ae7409"
+    },
+    "spaces.py": {
+      "source": "src/mandol/core/memory_space_registry.py",
+      "sha256": "ba9cf083a9278b91183d4286dd71e59d81a710bca4f0817ef927c78c28ded6f5"
+    }
+  }
+}

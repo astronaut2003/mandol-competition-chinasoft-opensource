@@ -1,0 +1,15 @@
+import {useState} from 'react';
+import {Layers,LogIn} from 'lucide-react';
+import {api,body,useResource} from './api';
+import {ErrorBox,Spinner} from './ui';
+export type Account={id:string;username:string;display_name:string;role:string;local_repository:number};
+export type Identity={user:Account;workspaces:import('./types').Workspace[];csrf_token:string};
+export default function Login({onLogin}:{onLogin:(identity:Identity)=>void}){
+ const config=useResource<{registration_enabled:boolean;approval_required:boolean}>('/auth/config');
+ const [register,setRegister]=useState(false),[username,setUsername]=useState(''),[password,setPassword]=useState(''),[confirmation,setConfirmation]=useState(''),[display,setDisplay]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false);
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{
+  if(register){if(password!==confirmation)throw new Error('两次输入的密码不一致');await api('/auth/register',body({username,password,password_confirmation:confirmation,display_name:display}));if(!config.data?.approval_required){onLogin(await api<Identity>('/auth/login',body({username,password})));return}setRegister(false);setPassword('');setConfirmation('');setNotice('登记请求已处理；如账号尚未激活，请联系管理员。')}
+  else onLogin(await api<Identity>('/auth/login',body({username,password})));
+ }catch(e){setError((e as Error).message)}finally{setBusy(false)}}
+ return <main className="auth-page"><div className="auth-card"><a className="brand" href="#chat"><span className="brand-icon"><Layers size={22}/></span><strong>Mandol<span>AGENT MEMORY</span></strong></a><h1>{register?'创建账号':'登录记忆工作台'}</h1><p className="muted">每个账号拥有独立的对话、附件和长期记忆。</p><form onSubmit={submit}><label>账号<input aria-label="账号" autoComplete="username" required maxLength={64} value={username} onChange={e=>setUsername(e.target.value)}/></label>{register&&<label>显示名称<input aria-label="显示名称" maxLength={60} value={display} onChange={e=>setDisplay(e.target.value)}/></label>}<label>密码<input aria-label="密码" type="password" autoComplete={register?'new-password':'current-password'} required minLength={register?12:1} maxLength={128} value={password} onChange={e=>setPassword(e.target.value)}/></label>{register&&<label>确认密码<input aria-label="确认密码" type="password" autoComplete="new-password" required minLength={12} maxLength={128} value={confirmation} onChange={e=>setConfirmation(e.target.value)}/></label>}{register&&<p className="muted">密码至少 12 位，包含字母、数字、符号中的至少两类。</p>}{error&&<ErrorBox error={error}/ >}{notice&&<p role="status">{notice}</p>}<button type="submit" className="primary-button" disabled={busy}>{busy?<Spinner/>:<LogIn size={16}/ >}{register?'注册':'登录'}</button></form>{config.data?.registration_enabled&&<button className="muted-button" onClick={()=>{setRegister(!register);setError('');setNotice('')}}>{register?'返回登录':'注册新账号'}</button>}{!config.data?.registration_enabled&&<p className="muted">公开注册已关闭，请由本地管理员创建账号。</p>}</div></main>
+}

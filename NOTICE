@@ -1,0 +1,12 @@
+Mandol Agent Memory Platform
+
+This application derives from the Mandol research code and the Mandol ChinaSoft
+engineering implementation. It reuses the canonical memory substrate, typed
+memory builders, provenance validation and retrieval code. Application changes
+in this release adapt installation, configuration, packaging and deployment for
+an independent repository; they are not a claim of a new retrieval algorithm.
+
+The original Apache-2.0 substrate notices are retained at
+packages/substrate/NOTICE and packages/substrate/LICENSE. Original source
+comments, including third-party copyright notices, remain in their files.
+See THIRD_PARTY_NOTICES.md for separate dependency, model and service terms.

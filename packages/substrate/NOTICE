@@ -1,0 +1,16 @@
+Mandol Multimodal is derived from Mandol, the open-source agent memory system
+maintained by the Mandol Team (https://github.com/AgentCombo/Mandol).
+The upstream project is distributed under the Apache License, Version 2.0;
+see LICENSE for the license text.
+
+Original technical report:
+Yuhan Zhang, Zhiyuan Guo, Ziheng Zeng, Wei Wang, Wentao Wu, and Lijie Xu.
+"Mandol: An Agglomerative Agent Memory System for Long-Term Conversations."
+arXiv:2606.29778 (2026), https://arxiv.org/abs/2606.29778.
+
+Multimodal-track modifications in this repository add an AML Add/Search/Health
+adapter, strict image ingestion, per-user original-image storage, a replaceable
+visual extraction interface, deterministic text rendering into L0 MemoryUnits,
+SQLite-backed idempotent writes and graph recovery, and ranked multimodal
+evidence reconstruction. The upstream Mandol retrieval implementation remains
+unchanged. The mock extractor and local tests are not an official AML result.

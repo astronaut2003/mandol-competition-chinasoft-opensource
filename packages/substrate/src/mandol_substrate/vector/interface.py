@@ -1,0 +1,39 @@
+"""Operations consumed by publication, retrieval, graph and reconciliation.
+
+Successful writes are applied/visible, but only SQLite T2 publishes a mutation.
+Deletes remove stale immutable physical revisions, never a future logical UID.
+Search returns current canonical revisions or fails closed if its bounded
+physical candidate budget cannot establish the requested logical prefix.
+"""
+
+from dataclasses import dataclass
+from typing import Protocol, runtime_checkable
+
+
+@dataclass(frozen=True)
+class ProjectionHit:
+    logical_uid: str
+    score: float
+    metadata: dict
+
+
+@runtime_checkable
+class PublicationProjection(Protocol):
+    def ensure_schema(self, scope, *, create=False): ...
+    def upsert_projection(self, scope, rows): ...
+    def delete_projection(self, scope, uids): ...
+    def get_projection_metadata(self, scope, uids, *, vectors=False) -> dict: ...
+    def health(self) -> bool: ...
+
+
+@runtime_checkable
+class VectorProjectionBackend(PublicationProjection, Protocol):
+    profile_hash: str
+
+    def search_dense(self, scope, vector, *, limit, published_seq, **filters): ...
+    def search_splade(self, scope, sparse, *, limit, published_seq, **filters): ...
+    def get_candidate_embeddings(self, scope, uids) -> dict: ...
+    def iter_metadata(self, scope, batch_size=128): ...
+    def audit_rows(self, scope): ...
+    def gc_scope(self, scope, *, only_uids=None): ...
+    def close(self): ...
