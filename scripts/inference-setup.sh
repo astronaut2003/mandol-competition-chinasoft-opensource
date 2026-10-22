@@ -8,7 +8,10 @@ for recipe in 029:0.29.0 025:0.25.1; do
   suffix="${recipe%%:*}"; version="${recipe#*:}"; target=".venv-vllm-$suffix"
   echo "Install isolated vLLM $version in $target (CUDA dependencies can require several GB)."
   [[ -x "$target/bin/python" ]] || uv venv --python 3.12 "$target"
-  uv pip install --python "$target/bin/python" "vllm==$version"
+  if ! uv pip install --python "$target/bin/python" "vllm==$version"; then
+    echo "vLLM $version installation failed. No dependency override or model substitution was applied. See docs/INFERENCE.md; existing compatible remote endpoints remain supported." >&2
+    exit 2
+  fi
   "$target/bin/python" -c 'import importlib.metadata,torch; print("vLLM",importlib.metadata.version("vllm"),"CUDA",torch.cuda.is_available())'
 done
 printf '%s\n' 'Model weights are not downloaded automatically.' 'Run ./scripts/download-models.sh, configure *_MANAGED=true, then explicitly run ./scripts/inference-start.sh.'

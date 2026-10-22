@@ -37,7 +37,7 @@ SQLite 是真实记录；Qdrant 是可重建的检索投影。模型权重不在
 
 ## 环境要求
 
-Linux、Python 3.12、Node.js 22 或更新版本、uv、Docker 和 Compose 插件。基础安装不需要 GPU；完整检索需要三个符合协议的独立 GPU HTTP 服务。生成、视觉与联网需要用户自行提供的 DeepSeek 凭据。
+Linux、Python 3.12、Node.js 22.12 或更新版本、uv、Docker 和 Compose 插件。基础安装不需要 GPU；完整检索需要三个符合协议的独立 GPU HTTP 服务。生成、视觉与联网需要用户自行提供的 DeepSeek 凭据。
 
 ## 快速开始
 

@@ -4,7 +4,7 @@ import os
 from urllib.parse import urlsplit
 from mandol_substrate.state.models import digest
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(os.getenv('CHINASOFT_APP_ROOT', str(Path(__file__).resolve().parents[3]))).resolve()
 
 
 def env(name, default):

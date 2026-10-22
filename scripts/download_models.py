@@ -2,7 +2,10 @@
 """Explicit public model download, pinned revisions and content-hash verification."""
 from pathlib import Path
 import argparse,os,sys
-ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'src'))
+ROOT=Path(__file__).resolve().parents[1]
+# The model environment does not install the Web application. Use only the
+# bundled, stdlib-only canonical recipe helpers from this same repository.
+sys.path[:0]=[str(ROOT/'src'),str(ROOT/'packages/substrate/src')]
 from mandol_competition.chinasoft.retrieval_contract import MODELS,verify_artifact
 
 def main():

@@ -18,6 +18,6 @@ COPY demo/ demo/
 COPY --from=studio /build/dist/ studio/dist/
 RUN groupadd --gid 10001 mandol && useradd --uid 10001 --gid mandol --no-create-home mandol && mkdir /app/data && chown mandol:mandol /app/data
 USER mandol
-ENV PATH=/app/.venv/bin:$PATH
+ENV PATH=/app/.venv/bin:$PATH CHINASOFT_APP_ROOT=/app
 EXPOSE 20600
 CMD ["uvicorn", "mandol_competition.chinasoft.api:create_app", "--factory", "--host", "0.0.0.0", "--port", "20600", "--workers", "1", "--no-access-log", "--timeout-graceful-shutdown", "90"]

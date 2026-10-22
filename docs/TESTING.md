@@ -6,18 +6,18 @@
 
 ```bash
 uv sync --locked --group dev
-.venv/bin/pytest -q tests/chinasoft
+.venv/bin/pytest -q tests
 npm --prefix studio ci
 npm --prefix studio run build
 ```
 
-涉及真实 Qdrant 的测试默认在未提供 `MANDOL_TEST_QDRANT` 时跳过，按实际 pytest 统计判断；其余测试使用明确的传输协议注入或本地 SQLite，并不代表真实 GPU/DeepSeek 验收。
+`tests/chinasoft` 是 SQLite/API 和明确注入的模型协议回归，`tests/test_deployment.py` 检查发布隔离与合成示例。`tests/integration/test_qdrant.py` 使用真实独立 Qdrant；未提供 `MANDOL_TEST_QDRANT` 时跳过。该测试使用明确标注的合成向量，仅证明数据库协议及过滤，不代表真实 Qwen/SPLADE 推理。所有测试按实际 pytest 统计判断。
 
 ## 独立 Qdrant
 
 ```bash
 docker compose -p mandol-os-native up -d qdrant
-MANDOL_TEST_QDRANT=http://127.0.0.1:20633 .venv/bin/pytest -q tests/chinasoft
+MANDOL_TEST_QDRANT=http://127.0.0.1:20633 .venv/bin/pytest -q tests
 ```
 
 测试为自己的随机 collection/Scope 建立并清理数据；不要设置成其他工程的数据库端点。应用 collection 与测试 collection 隔离。

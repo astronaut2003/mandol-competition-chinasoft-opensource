@@ -8,7 +8,7 @@
 
 ## 系统准备
 
-本机验收环境为 Linux x86_64、Python 3.12、Node.js 24 和 Docker Compose 插件。Python 声明固定为 3.12；Node.js 建议 22 或更新版本。需要可访问 Python/npm 包源、容器镜像源以及用户选择的模型/API 服务。
+本项目基于 Linux 系统验证，验收环境为 x86_64、Python 3.12.13、Node.js 24.21.0、Docker 29.6.1 和 Compose 插件。不同发行版应按依赖和驱动条件自行验证。Python 声明固定为 3.12；Node.js 建议 22.12 或更新版本。需要可访问 Python/npm 包源、容器镜像源以及用户选择的模型/API 服务。
 
 先从各工具官方渠道安装 uv、Node.js LTS、Docker Engine 和 Compose 插件，然后检查：
 

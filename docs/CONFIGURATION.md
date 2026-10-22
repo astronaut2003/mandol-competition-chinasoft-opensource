@@ -130,3 +130,5 @@ CHINASOFT_SEARCH_API_KEY_ENV=MANDOL_SEARCH_SECRET
 用户/Workspace 限额在后端执行。`MEMORY_QUERY_STRATEGY=baseline` 是查询策略回退；回退不修改记忆身份、来源版本或索引数值协议。默认自适应策略不代表每种 Lane 都必须调用全部三个模型。
 
 `CHINASOFT_STUDIO_DIST` 由 API 静态文件入口读取，默认项目 `studio/dist`；容器设置为 `/app/studio/dist`。它不会改变 Vite 开发代理。`CHINASOFT_VLLM_MANIFEST_FILE` 由模型启动器为其拥有的服务设置，供元信息中间件校验，不是用户绕过模型身份验证的开关。
+
+`CHINASOFT_APP_ROOT` 指定安装后的资源根目录，默认由源码位置推导。容器使用 `/app`，让非 editable 安装仍能找到公开合成图片和前端；不要指向其他项目。
