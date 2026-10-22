@@ -138,3 +138,5 @@ CHINASOFT_SEARCH_API_KEY_ENV=MANDOL_SEARCH_SECRET
 `HF_TOKEN` 仅由显式模型下载命令读取，用于已经获得访问权限的 Hugging Face 模型。默认不读取全局 HF 登录，不保存 Token；SPLADE-v3 的门禁条款需由模型使用者在官方页面接受。下载器固定使用官方 Hugging Face 源，不继承全局 `HF_ENDPOINT` 镜像。它不参与 FastAPI 或检索 Profile。`UV_CACHE_DIR` 与 `UV_PYTHON_INSTALL_DIR` 由脚本固定到本项目 `.cache/uv`、`.toolchains`；推理安装使用独立 `--no-config` 和 hash lock。
 
 Linux `docker-compose.loopback.yml` 使用 host network 访问宿主回环模型，读取 `CHINASOFT_EMBEDDING_BASE_URL`、`CHINASOFT_SPLADE_URL`、`CHINASOFT_RERANKER_BASE_URL`。基础 bridge Compose 使用 `CHINASOFT_CONTAINER_*_URL`；两种网络模式不要混用地址假设。
+
+`MANDOL_DOWNLOAD_CACHE_DIR` 可显式复用公开包下载缓存；默认仍为当前检出的 `.cache/uv`。这只复用包管理器下载内容，不复制虚拟环境或依赖另一工程的源码。新检出仍各自安装自己的 Python 环境、前端依赖和数据。不要指向含私有源码、凭据或未授权资源的目录。

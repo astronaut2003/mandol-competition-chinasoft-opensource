@@ -102,3 +102,5 @@ docker compose -f docker-compose.yml -f docker-compose.loopback.yml -p mandol-os
 ## 许可
 
 源码、外部权重、驱动与 API 分别适用各自条件。Qwen/BGE 权重模型卡标注 Apache-2.0；SPLADE-v3 权重标注 **CC-BY-NC-SA-4.0**，不由本项目 Apache 许可重新授权。仓库与应用镜像均不包含模型权重。
+
+在同一机器复验多个干净检出时，可显式设置 `MANDOL_DOWNLOAD_CACHE_DIR` 复用本工程已从公开源下载的包缓存，`CHINASOFT_MODEL_CACHE` 复用已授权、固定哈希的公共模型缓存。每个检出仍创建自己的推理虚拟环境和进程清单，不复制已安装环境，也不读取私有工程。

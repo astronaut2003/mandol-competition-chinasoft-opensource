@@ -2,7 +2,7 @@
 set -euo pipefail
 MANDOL_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$MANDOL_ROOT"
-export UV_CACHE_DIR="$MANDOL_ROOT/.cache/uv" UV_PYTHON_INSTALL_DIR="$MANDOL_ROOT/.toolchains"
+export UV_PYTHON_INSTALL_DIR="$MANDOL_ROOT/.toolchains"
 export npm_config_cache="$MANDOL_ROOT/.cache/npm"
 export PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 # Explicit process environment wins over the local file, including credentials.
@@ -13,6 +13,9 @@ done < <(compgen -e)
 if [[ -f .env ]]; then set -a; source .env; set +a; fi
 for MANDOL_ENV_NAME in "${!MANDOL_CALLER_ENV[@]}"; do export "$MANDOL_ENV_NAME=${MANDOL_CALLER_ENV[$MANDOL_ENV_NAME]}"; done
 unset MANDOL_CALLER_ENV MANDOL_ENV_NAME
+# Sharing public package downloads is an explicit operator choice. Environments
+# and editable source installs still belong to this checkout.
+export UV_CACHE_DIR="${MANDOL_DOWNLOAD_CACHE_DIR:-$MANDOL_ROOT/.cache/uv}"
 export CHINASOFT_DATA_DIR="${CHINASOFT_DATA_DIR:-$MANDOL_ROOT/data/native}"
 export CHINASOFT_HOST="${CHINASOFT_HOST:-127.0.0.1}" CHINASOFT_PORT="${CHINASOFT_PORT:-20600}"
 # A different project name cannot silently target an unrelated Compose stack.
