@@ -40,3 +40,14 @@ def test_model_download_help_does_not_depend_on_application_environment():
  import sys
  result=subprocess.run([sys.executable,'-I','-S',str(ROOT/'scripts/download_models.py'),'--help'],cwd=ROOT,text=True,capture_output=True,check=True)
  assert '--channel' in result.stdout
+
+
+def test_running_api_setup_checks_database_without_second_owner(tmp_path,monkeypatch):
+ from mandol_competition.chinasoft.config import Settings
+ from mandol_competition.chinasoft.service import Platform
+ p=Platform(Settings(data_dir=tmp_path,allow_retrieval_degraded=True))
+ try:
+  monkeypatch.setattr(module,'owned',lambda:{'data_dir':str(tmp_path)})
+  module.init(p.settings)
+  assert p.state.health()
+ finally:p.close()

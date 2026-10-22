@@ -58,8 +58,18 @@ def status(s):
 
 
 def init(s):
+    import sqlite3
+    current=owned()
+    if current:
+        if current['data_dir']!=str(s.data_dir):raise RuntimeError('Owned API uses a different data directory; stop it before initializing another database.')
+        with sqlite3.connect((s.data_dir/'state.sqlite3').as_uri()+'?mode=ro',uri=True) as db:
+            check=db.execute('PRAGMA quick_check').fetchone()[0]
+        if check!='ok':raise RuntimeError('SQLite quick_check failed')
+        print('Owned API is running; SQLite read-only check passed. Schema initialization deferred to the next normal restart.')
+        return
     from mandol_competition.chinasoft.service import Platform
-    p=Platform(s)
+    try:p=Platform(s)
+    except BlockingIOError as exc:raise RuntimeError('SQLite is owned by another process. No migration applied; stop its operator-managed instance before setup.') from exc
     try:
         import sqlite3
         with sqlite3.connect(s.data_dir/'state.sqlite3') as db:
