@@ -29,6 +29,12 @@ Mandol 在独立 HTTP 进程中运行模型，FastAPI 只调用端点。三个�
 
 CUDA runtime 以 `torch.version.cuda` 的实际值为准。其他 GPU 或驱动组合应运行安装器的 CUDA 检查和下面的真实推理验证；模型身份和数值配方仍需保持一致。
 
+### 发布前依赖安全状态
+
+上述固定组合通过的是功能与数值验收。2026-10-23 的依赖审计仍在 vLLM 0.29.0 / 0.25.1、setuptools 80.10.2，以及 BGE 环境的 PyTorch 2.11.0 / diskcache 5.6.3 中检出上游安全公告，不能据功能验收宣称该组合已通过公开部署安全审计。vLLM 的修复涉及后续版本；setuptools 83.0.0 又超出当前 vLLM 的 `<81` 约束，不能跳过依赖检查强行替换。
+
+完成兼容升级和真实 GPU 回归前，保留此限制：模型端点仅供可信应用通过回环或受控专网访问，不直接对公网提供原始 vLLM API，不透传用户自定义采样、token ID 或多模态加载参数，并限制模型缓存目录的写权限。相关上游公告见 [vLLM](https://github.com/vllm-project/vllm/security/advisories) 与 [setuptools](https://github.com/pypa/setuptools/security/advisories/GHSA-h35f-9h28-mq5c)。本次未将不同版本冒充为已验证的数值 Profile。
+
 ## 1. 安装独立环境
 
 ```bash

@@ -24,11 +24,11 @@ GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型�
 |---|---|---|
 | annotated-doc | 0.0.4 | MIT |
 | annotated-types | 0.7.0 | MIT |
-| anyio | 4.13.0 | MIT |
+| anyio | 4.14.2 | MIT |
 | argon2-cffi | 25.1.0 | MIT |
 | argon2-cffi-bindings | 26.1.0 | MIT |
 | attrs | 26.1.0 | MIT |
-| certifi | 2026.4.22 | Mozilla Public License 2.0 (MPL 2.0) |
+| certifi | 2026.10.19 | Mozilla Public License 2.0 (MPL 2.0) |
 | cffi | 2.1.1 | MIT-0 |
 | click | 8.3.3 | BSD-3-Clause |
 | distro | 1.9.0 | Apache-2.0 |
@@ -40,7 +40,7 @@ GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型�
 | httpcore | 1.0.9 | BSD-3-Clause |
 | httpx | 0.28.1 | BSD License |
 | hyperframe | 6.1.0 | MIT |
-| idna | 3.13 | BSD-3-Clause |
+| idna | 3.15 | BSD-3-Clause |
 | iniconfig | 2.3.0 | MIT |
 | jieba | 0.42.1 | MIT License |
 | jiter | 0.14.0 | MIT |
@@ -52,7 +52,7 @@ GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型�
 | numpy | 1.26.4 | BSD-3-Clause (with bundled component notices) |
 | openai | 2.32.0 | Apache Software License |
 | packaging | 26.1 | Apache-2.0 OR BSD-2-Clause |
-| pillow | 12.2.0 | MIT-CMU |
+| pillow | 13.0.0 | MIT-CMU |
 | pluggy | 1.6.0 | MIT License |
 | portalocker | 3.2.0 | BSD-3-Clause |
 | protobuf | 7.34.1 | BSD-3-Clause |
@@ -60,7 +60,7 @@ GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型�
 | pydantic | 2.13.3 | MIT |
 | pydantic_core | 2.46.3 | MIT |
 | Pygments | 2.20.0 | BSD-2-Clause |
-| pytest | 9.0.2 | MIT |
+| pytest | 9.0.3 | MIT |
 | python-multipart | 0.0.32 | Apache-2.0 |
 | qdrant-client | 1.19.0 | Apache Software License |
 | referencing | 0.37.0 | MIT |
@@ -73,7 +73,7 @@ GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型�
 | tree-sitter-language-pack | 1.14.3 | MIT |
 | typing-inspection | 0.4.2 | MIT |
 | typing_extensions | 4.15.0 | PSF-2.0 |
-| urllib3 | 2.6.3 | MIT |
+| urllib3 | 2.8.0 | MIT |
 | uvicorn | 0.49.0 | BSD-3-Clause |
 
 ## Node.js

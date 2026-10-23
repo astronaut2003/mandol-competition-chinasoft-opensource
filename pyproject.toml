@@ -14,11 +14,11 @@ dependencies = [
   "mandol-substrate==0.1.0", "fastapi==0.136.3", "pydantic==2.13.3", "uvicorn==0.49.0",
   "httpx==0.28.1", "numpy==1.26.4", "python-multipart>=0.0.32", "jsonschema>=4.26.0",
   "jieba>=0.42.1", "argon2-cffi==25.1.0", "rustworkx==0.17.1", "networkx==3.6.1",
-  "tree-sitter==0.25.2", "tree-sitter-language-pack==1.14.3", "pillow==12.2.0", "openai==2.32.0",
+  "tree-sitter==0.25.2", "tree-sitter-language-pack==1.14.3", "pillow==13.0.0", "openai==2.32.0",
 ]
 
 [dependency-groups]
-dev = ["pytest==9.0.2"]
+dev = ["pytest==9.0.3"]
 
 [tool.uv.workspace]
 members = ["packages/substrate"]
@@ -39,8 +39,8 @@ markers = ["unit: isolated protocol/SQLite tests", "integration_qdrant: independ
 constraint-dependencies = [
   "annotated-doc==0.0.4",
   "annotated-types==0.7.0",
-  "anyio==4.13.0",
-  "certifi==2026.4.22",
+  "anyio==4.14.2",
+  "certifi==2026.10.19",
   "click==8.3.3",
   "colorama==0.4.6",
   "distro==1.9.0",
@@ -52,21 +52,21 @@ constraint-dependencies = [
   "httpcore==1.0.9",
   "httpx==0.28.1",
   "hyperframe==6.1.0",
-  "idna==3.13",
+  "idna==3.15",
   "iniconfig==2.3.0",
   "jiter==0.14.0",
   "networkx==3.6.1",
   "numpy==1.26.4",
   "openai==2.32.0",
   "packaging==26.1",
-  "pillow==12.2.0",
+  "pillow==13.0.0",
   "pluggy==1.6.0",
   "portalocker==3.2.0",
   "protobuf==7.34.1",
   "pydantic-core==2.46.3",
   "pydantic==2.13.3",
   "pygments==2.20.0",
-  "pytest==9.0.2",
+  "pytest==9.0.3",
   "pywin32==312",
   "qdrant-client==1.19.0",
   "rustworkx==0.17.1",
@@ -77,6 +77,6 @@ constraint-dependencies = [
   "tree-sitter==0.25.2",
   "typing-extensions==4.15.0",
   "typing-inspection==0.4.2",
-  "urllib3==2.6.3",
+  "urllib3==2.8.0",
   "uvicorn==0.49.0"
 ]

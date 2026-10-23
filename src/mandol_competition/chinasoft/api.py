@@ -797,7 +797,7 @@ def create_app(settings=None, *, platform=None, start_workers=True):
     @app.get('/{path:path}',include_in_schema=False)
     def studio(path:str):
         if path.startswith(('api/','healthz')):raise HTTPException(404)
-        if not (dist/'index.html').is_file():return JSONResponse({'message':'Studio 尚未构建，请运行 scripts/chinasoft-demo.sh build'},status_code=503)
+        if not (dist/'index.html').is_file():return JSONResponse({'message':'Studio 尚未构建，请运行 npm --prefix studio run build'},status_code=503)
         return FileResponse(dist/'index.html',media_type='text/html')
 
     return app
