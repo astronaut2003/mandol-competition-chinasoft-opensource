@@ -101,19 +101,19 @@
 | `CHINASOFT_DENSE_GPU_MEMORY` | 见 retrieval_contract.py 的该通道预算 |
 | `CHINASOFT_DENSE_MAX_SEQS` | 2；vLLM 最大并发序列 |
 | `CHINASOFT_DENSE_MAX_BATCHED_TOKENS` | 见该通道 max_length |
-| `CHINASOFT_DENSE_VLLM_PYTHON` | 项目 .venv-vllm-029/bin/python；BGE 为 .venv-vllm-025/bin/python |
+| `CHINASOFT_DENSE_VLLM_PYTHON` | 项目 .venv-vllm-unified/bin/python（Python 3.12 / vLLM 0.32.0） |
 | `CHINASOFT_SPARSE_MANAGED` | false；只在显式 inference-start 中启动 |
 | `CHINASOFT_SPARSE_GPU` | 0；CUDA 设备标识 |
 | `CHINASOFT_SPARSE_GPU_MEMORY` | 见 retrieval_contract.py 的该通道预算 |
 | `CHINASOFT_SPARSE_MAX_SEQS` | 2；vLLM 最大并发序列 |
 | `CHINASOFT_SPARSE_MAX_BATCHED_TOKENS` | 见该通道 max_length |
-| `CHINASOFT_SPARSE_VLLM_PYTHON` | 项目 .venv-vllm-029/bin/python；BGE 为 .venv-vllm-025/bin/python |
+| `CHINASOFT_SPARSE_VLLM_PYTHON` | 项目 .venv-vllm-unified/bin/python（Python 3.12 / vLLM 0.32.0） |
 | `CHINASOFT_RERANKER_MANAGED` | false；只在显式 inference-start 中启动 |
 | `CHINASOFT_RERANKER_GPU` | 0；CUDA 设备标识 |
 | `CHINASOFT_RERANKER_GPU_MEMORY` | 见 retrieval_contract.py 的该通道预算 |
 | `CHINASOFT_RERANKER_MAX_SEQS` | 2；vLLM 最大并发序列 |
 | `CHINASOFT_RERANKER_MAX_BATCHED_TOKENS` | 见该通道 max_length |
-| `CHINASOFT_RERANKER_VLLM_PYTHON` | 项目 .venv-vllm-029/bin/python；BGE 为 .venv-vllm-025/bin/python |
+| `CHINASOFT_RERANKER_VLLM_PYTHON` | 项目 .venv-vllm-unified/bin/python（Python 3.12 / vLLM 0.32.0） |
 
 ## 使用示例
 

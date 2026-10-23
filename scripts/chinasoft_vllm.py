@@ -9,7 +9,9 @@ sys.path.insert(0,str(ROOT/'src'))
 from mandol_competition.chinasoft.config import Settings,env
 from mandol_competition.chinasoft.retrieval_contract import MODELS,cache_snapshot,verify_artifact,recipe,recipe_hash
 from mandol_competition.chinasoft.models import ModelError
-RUN=ROOT/'.runtime/vllm-gpu'
+RUN=Path(env('INFERENCE_RUNTIME_DIR',ROOT/'.runtime/vllm-gpu')).resolve()
+if not RUN.is_relative_to(ROOT):
+    raise ValueError('Inference lifecycle files must belong to this checkout')
 
 
 def settings():return Settings()
@@ -29,8 +31,7 @@ def deployment(channel):
     parsed=urlsplit(url)
     if managed and (parsed.hostname not in ('127.0.0.1','localhost') or not parsed.port or parsed.path):
         raise ValueError('Managed services require an explicit loopback origin; use MANAGED=false for remote endpoints')
-    version='025' if channel=='reranker' else '029'
-    python=Path(env(prefix+'_VLLM_PYTHON',ROOT/('.venv-vllm-'+version)/'bin/python'))
+    python=Path(env(prefix+'_VLLM_PYTHON',ROOT/'.venv-vllm-unified/bin/python'))
     cache=Path(env('MODEL_CACHE',ROOT/'data/models/hub')).expanduser().resolve()
     return {'managed':managed,'endpoint':url,'gpu':device,'gpu_memory':fraction,'max_seqs':seqs,
             'max_batched_tokens':batched,'python':str(python),'cache':str(cache),'recipe_hash':recipe_hash(channel)}
@@ -89,7 +90,8 @@ def command(channel,d):
         '--enforce-eager','--max-model-len',str(m['max_length']),'--max-num-seqs',str(d['max_seqs']),
         '--max-num-batched-tokens',str(d['max_batched_tokens']),'--gpu-memory-utilization',str(d['gpu_memory']),
         '--served-model-name',m['alias'],'--host','127.0.0.1','--port',str(urlsplit(d['endpoint']).port),
-        '--disable-uvicorn-access-log','--middleware','chinasoft_vllm_metadata.ContractMetadata']
+        '--disable-uvicorn-access-log','--allowed-origins','[]','--allowed-methods','["GET","POST"]',
+        '--middleware','chinasoft_vllm_metadata.ContractMetadata']
     if m['pooler']:result+=['--pooler-config',json.dumps(m['pooler'])]
     if m.get('overrides'):result+=['--hf-overrides',json.dumps(m['overrides'])]
     key_env={'dense':settings().embedding_api_key_env,'sparse':settings().sparse_api_key_env,'reranker':settings().reranker_api_key_env}[channel]
@@ -122,9 +124,16 @@ def start_one(channel):
     environment=dict(os.environ)
     compilation=RUN/'cache'/channel
     compilation.mkdir(parents=True,exist_ok=True)
+    # Unix socket paths have a small length limit. A checkout-specific private
+    # directory also avoids sharing engine IPC files with unrelated services.
+    rpc=Path('/tmp')/('mandol-vllm-'+hashlib.sha256(str(RUN).encode()).hexdigest()[:12])/channel
+    rpc.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+    rpc.parent.chmod(0o700)
+    rpc.mkdir(parents=True,exist_ok=True,mode=0o700)
+    rpc.chmod(0o700)
     environment.update(CUDA_VISIBLE_DEVICES=d['gpu'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',
         VLLM_NO_USAGE_STATS='1',VLLM_USE_V2_MODEL_RUNNER='0',VLLM_SERVER_DEV_MODE='0',VLLM_HOST_IP='127.0.0.1',OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',
-        OPENBLAS_NUM_THREADS='2',VLLM_RPC_BASE_PATH='/tmp',VLLM_CACHE_ROOT=str(RUN/'cache'/channel),
+        OPENBLAS_NUM_THREADS='2',VLLM_RPC_BASE_PATH=str(rpc),VLLM_CACHE_ROOT=str(RUN/'cache'/channel),
         HF_HUB_CACHE=d['cache'],HF_HOME=str(Path(d['cache']).parent),
         XDG_CACHE_HOME=str(compilation/'xdg'),TRITON_CACHE_DIR=str(compilation/'triton'),
         FLASHINFER_WORKSPACE_BASE=str(compilation/'flashinfer'),
@@ -185,6 +194,7 @@ def stop_one(channel):
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['start','stop','status','diagnose']);parser.add_argument('--channel',choices=list(MODELS));args=parser.parse_args()
     RUN.mkdir(parents=True,exist_ok=True)
+    RUN.chmod(0o700)
     with (RUN/'.lifecycle.lock').open('a') as f:
         fcntl.flock(f,fcntl.LOCK_EX)
         channels=[args.channel] if args.channel else list(MODELS)

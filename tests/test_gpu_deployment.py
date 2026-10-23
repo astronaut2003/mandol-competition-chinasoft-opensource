@@ -23,13 +23,11 @@ def test_gpu_installer_isolates_workspace_constraints_and_checks_dependencies():
     script=(ROOT/'scripts/inference-setup.sh').read_text()
     assert 'uv pip sync --no-config' in script and '--require-hashes' in script
     assert 'uv pip check --no-config' in script and '--no-deps' not in script
-    for suffix in ('029','025'):
-        lock=(ROOT/f'deploy/inference/vllm-{suffix}.lock').read_text()
-        assert '--hash=sha256:' in lock and 'protobuf==7.34.1' not in lock
-        expected='vllm==0.29.0' if suffix=='029' else 'vllm==0.25.1'
-        assert expected in lock
-    # CUTLASS 4.6.2 requires <7; 4.5.2 does not impose that same constraint.
-    assert 'protobuf==6.33.6' in (ROOT/'deploy/inference/vllm-029.lock').read_text()
+    lock=(ROOT/'deploy/inference/vllm-unified.lock').read_text()
+    assert '--hash=sha256:' in lock and 'protobuf==7.34.1' not in lock
+    assert 'vllm==0.32.0' in lock and 'nvidia-cutlass-dsl==4.8.0' in lock
+    assert "(3, 12)" in script and '--only-binary :all:' in script
+    assert {m['version'] for m in MODELS.values()} == {'0.32.0'}
 
 
 def test_start_failure_rolls_back_only_new_owned_channels(monkeypatch,tmp_path):

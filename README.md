@@ -81,7 +81,7 @@ export CHINASOFT_RERANKER_MANAGED=true
 
 打开 **http://127.0.0.1:20600**。SPLADE 官方仓库需要接受访问条款，并通过 `HF_TOKEN` 下载。首次安装需要下载 CUDA 依赖和指定 revision 的模型；普通应用启动不会隐式下载或加载 GPU 权重。
 
-Dense、SPLADE、BGE 分别通过独立 vLLM HTTP 服务提供能力。推理环境有自己的依赖锁，不与 Web 应用混装。详见 [GPU 部署](docs/INFERENCE.md)。
+Dense、SPLADE、BGE 统一使用 **vLLM 0.32.0、Python 3.12**，分别运行独立 HTTP 服务，共用本工程的推理环境，与 Web 应用分开安装。详见 [GPU 部署](docs/INFERENCE.md)。
 
 ### 暂时没有 GPU？
 

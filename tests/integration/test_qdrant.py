@@ -13,7 +13,7 @@ def server():
  url=os.getenv('MANDOL_TEST_QDRANT')
  if not url:pytest.skip('Set MANDOL_TEST_QDRANT to your independent test server')
  parsed=urlsplit(url)
- if parsed.hostname in ('localhost','127.0.0.1') and parsed.port in (18633,19633):pytest.fail('Reserved local deployment cannot be used as a release test server')
+ if parsed.hostname in ('localhost','127.0.0.1') and parsed.port in (18633,19633,20633):pytest.fail('Reserved local deployment cannot be used as a release test server')
  client=QdrantClient(url=url,timeout=10,prefer_grpc=False,check_compatibility=False)
  name='chinasoft_release_test_'+uuid.uuid4().hex
  client.create_collection(name,vectors_config={'dense':models.VectorParams(size=4,distance=models.Distance.COSINE)},sparse_vectors_config={'sparse':models.SparseVectorParams()})

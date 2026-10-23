@@ -6,9 +6,9 @@ Mandol 在独立 HTTP 进程中运行模型，FastAPI 只调用端点。三个�
 
 | 通道 | 模型 / revision | 固定数值语义 | 运行时 / 默认端口 |
 |---|---|---|---|
-| Dense | `Qwen/Qwen3-Embedding-0.6B` / `97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3` | BF16、LAST pooling、1024 维、L2 normalize、4096 tokens；查询使用既有 instruction | vLLM 0.29.0 / 20631 |
-| Sparse | `naver/splade-v3` / `fdfeceb91d7b9de7985b38addd3ba9f53a59a355` | BF16、全 token `max(log1p(ReLU(logits)))`、30522 词表、512 tokens；查询与文档使用同一算法 | vLLM 0.29.0 / 20636 |
-| Reranker | `BAAI/bge-reranker-v2-m3` / `953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e` | BF16、成对输入、CLS logit + sigmoid、4096 tokens；分数越高越相关 | vLLM 0.25.1 / 20632 |
+| Dense | `Qwen/Qwen3-Embedding-0.6B` / `97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3` | BF16、LAST pooling、1024 维、L2 normalize、4096 tokens；查询使用既有 instruction | vLLM 0.32.0 / 20631 |
+| Sparse | `naver/splade-v3` / `fdfeceb91d7b9de7985b38addd3ba9f53a59a355` | BF16、全 token `max(log1p(ReLU(logits)))`、30522 词表、512 tokens；查询与文档使用同一算法 | vLLM 0.32.0 / 20636 |
+| Reranker | `BAAI/bge-reranker-v2-m3` / `953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e` | BF16、成对输入、CLS logit + sigmoid、4096 tokens；分数越高越相关 | vLLM 0.32.0 / 20632 |
 
 `src/mandol_competition/chinasoft/retrieval_contract.py` 保存权重 SHA256、tokenizer/config 身份、pooling 和各 memory family 的 Profile。版本、算法与权重参与 Profile 身份，端点地址不参与。更换端口不需要重建；更换数值配方不能直接复用旧投影。
 
@@ -18,39 +18,40 @@ Mandol 在独立 HTTP 进程中运行模型，FastAPI 只调用端点。三个�
 
 安装器会实际执行 CUDA 张量运算。成功安装依赖不能替代模型验证。设备显存需求包含权重、CUDA 上下文、运行时与激活；本项目不承诺所有低显存 GPU 均可运行三个服务。启动前检查 GPU_MEMORY 总预算与额外 2048 MiB 余量，资源不足时报告诊断，保留其他项目进程。
 
-### 已验证的运行组合
+### 统一运行基线
 
-2026-10-23 基于 Linux 系统验证，在 RTX 5090 Laptop（24463 MiB）、NVIDIA Driver 617.42 环境中完成三服务真实 HTTP 推理，并与同一权重的 Transformers CUDA 输出对照。应用和模型环境均为 Python 3.12.13：
+三个服务统一使用 **Python 3.12、vLLM 0.32.0、PyTorch 2.13.0、CUDA runtime 13.0**，分别运行独立进程，共用本工程的 `.venv-vllm-unified`。应用仍使用自己的 `.venv`，不会加载模型权重。
 
-| 用途 | vLLM | PyTorch | CUDA runtime | protobuf |
+| vLLM | Python | PyTorch | CUTLASS DSL | protobuf |
 |---|---|---|---|---|
-| Dense / SPLADE | 0.29.0 | 2.13.0+cu130 | 13.0 | 6.33.6 |
-| BGE Reranker | 0.25.1 | 2.11.0+cu130 | 13.0 | 7.36.2 |
+| 0.32.0 | 3.12 | 2.13.0 | 4.8.0 | 7.36.2 |
 
-CUDA runtime 以 `torch.version.cuda` 的实际值为准。其他 GPU 或驱动组合应运行安装器的 CUDA 检查和下面的真实推理验证；模型身份和数值配方仍需保持一致。
+运行平台为 Linux x86_64、glibc >=2.31。安装器实际检查 CUDA；模型是否 Ready 还必须通过下文的真实 HTTP 推理验证。其他显卡和驱动组合请按同样流程验证。
 
-### 发布前依赖安全状态
+本轮基于 Linux、RTX 5090 Laptop（24463 MiB）、Driver 617.42 和 Python 3.12.13 验证三路真实 GPU HTTP。固定中英文及代码样本中新旧单条向量、BGE 原始分数和排序一致；批量最大绝对差分别为 Dense 0.00336、SPLADE 0.05371、BGE 分数 0.000811，符合 BF16 容差。完整合成记忆与 DeepSeek Agent 链路、SQLite/Qdrant 重启持久化及账号隔离已验证。
 
-上述固定组合通过的是功能与数值验收。2026-10-23 的依赖审计仍在 vLLM 0.29.0 / 0.25.1、setuptools 80.10.2，以及 BGE 环境的 PyTorch 2.11.0 / diskcache 5.6.3 中检出上游安全公告，不能据功能验收宣称该组合已通过公开部署安全审计。vLLM 的修复涉及后续版本；setuptools 83.0.0 又超出当前 vLLM 的 `<81` 约束，不能跳过依赖检查强行替换。
+### 安全边界
 
-完成兼容升级和真实 GPU 回归前，保留此限制：模型端点仅供可信应用通过回环或受控专网访问，不直接对公网提供原始 vLLM API，不透传用户自定义采样、token ID 或多模态加载参数，并限制模型缓存目录的写权限。相关上游公告见 [vLLM](https://github.com/vllm-project/vllm/security/advisories) 与 [setuptools](https://github.com/pypa/setuptools/security/advisories/GHSA-h35f-9h28-mq5c)。本次未将不同版本冒充为已验证的数值 Profile。
+vLLM 0.32.0 是本轮核对的官方稳定版本，包含多项 Token ID、媒体解析、资源耗尽与内部通信修复，详见 [官方发布记录](https://github.com/vllm-project/vllm/releases/tag/v0.32.0) 和 [安全公告](https://github.com/vllm-project/vllm/security/advisories)。Python 3.12 下，上游仍要求 `setuptools<81`；锁定的 80.10.2 存在已知 sdist 文件筛选公告，因此安装只接受正式 wheel，不把本环境用于构建不受信任的源码包。不将本次升级描述为依赖零告警。
 
-## 1. 安装独立环境
+模型 HTTP 与内部通信绑定回环，禁用开发模式和浏览器 CORS，IPC 目录按工程隔离。不要向公网直接开放原始 vLLM，也不要把用户自定义 Token ID、采样或媒体加载参数透传给推理端点。远程部署须另外配置专网和认证，参见 [官方安全说明](https://docs.vllm.ai/en/stable/usage/security/)。
+
+## 1. 安装统一环境
 
 ```bash
 ./scripts/setup.sh
 ./scripts/inference-setup.sh
 ```
 
-推理安装使用 `deploy/inference/vllm-029.lock` 和 `vllm-025.lock`，分别创建 `.venv-vllm-029` 与 `.venv-vllm-025`，执行 `uv pip sync --no-config --require-hashes`、`uv pip check --no-config` 和实际 CUDA 运算。重复执行可复用本工程公开下载缓存，不从 Web 环境复制包。
+`deploy/inference/vllm-unified.lock` 固定完整依赖及哈希，创建本工程的 `.venv-vllm-unified`，执行 `uv pip sync --no-config --only-binary :all: --require-hashes`、依赖一致性检查和真实 CUDA 运算。重复执行复用公开下载缓存，不从应用或其他工程的已安装环境复制包。
 
-若只安装某一组，可使用 `./scripts/inference-setup.sh 029` 或 `025`。共享 uv 缓存的首次大型下载建议顺序安装，避免并行安装等待分发缓存锁。
+Web 工作区固定 protobuf 7.34.1，因此推理安装必须使用 `--no-config`。旧 vLLM 0.29.0 本身并未固定该版本；其 CUTLASS 4.6.2 依赖链要求 protobuf <7，才会与工作区约束冲突。新版 CUTLASS 4.8.0 放宽了该限制，独立锁正常解析 protobuf 7.36.2，未跳过依赖检查。
 
-### 为什么需要 `--no-config`
+### 已有部署迁移与回滚
 
-Web 项目的 uv 配置固定了 protobuf 7.34.1。uv 即使通过 `--python` 指向另一个虚拟环境，仍可能自动读取当前 workspace 的约束。vLLM 0.29.0 的官方依赖并没有固定 protobuf 7.34.1，而其 CUTLASS 4.6.2 依赖链要求 protobuf <7。独立推理锁选择 protobuf 6.33.6，隔离 workspace 配置后可正常解析。BGE 的 0.25.1 依赖集合使用自己的锁文件，不强制套用另一版本的 protobuf。
+升级前备份 SQLite、Qdrant、配置及当前 Git HEAD，并保留旧推理环境。先在空闲端口验证新版三个服务，再正常切换自己的服务。版本进入数值 Profile，新版本使用独立的版本化 Collection；应用会为已有有效记忆补建投影，保留 Canonical 记录、来源版本和旧 Collection。补建完成前以实际检索状态为准，不清空数据库或旧索引。
 
-此处修正了早期文档将 workspace 约束误判为上游依赖冲突的描述。没有使用 `--no-deps`、强制忽略冲突或修改模型配方。Web 自己的锁文件保持独立。
+需要回滚时，恢复备份对应的推理脚本、锁文件和数值契约，指向保留的旧环境并重启本工程服务，即可使用保留的旧 Collection。不要将整个 SQLite 回滚到旧备份来代替切换推理配置。旧运行时仍有上游安全告警，只能在隔离的可信网络中使用。
 
 ## 2. 下载固定模型
 

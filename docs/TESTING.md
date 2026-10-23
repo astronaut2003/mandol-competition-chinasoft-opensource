@@ -52,9 +52,9 @@ MANDOL_E2E_USERNAME=<你的账号> MANDOL_E2E_PASSWORD_FILE=<0600密码文件> n
 进一步在模型环境中加载同一份固定权重，用 Transformers CUDA 运算对照真实 HTTP 输出，核对 LAST + normalize、全 token SPLADE pooling 和 BGE sigmoid：
 
 ```bash
-.venv-vllm-029/bin/python scripts/verify-model-reference.py --channel dense --output .release-private/dense-reference.json
-.venv-vllm-029/bin/python scripts/verify-model-reference.py --channel sparse --output .release-private/sparse-reference.json
-.venv-vllm-025/bin/python scripts/verify-model-reference.py --channel reranker --output .release-private/bge-reference.json
+.venv-vllm-unified/bin/python scripts/verify-model-reference.py --channel dense --output .release-private/dense-reference.json
+.venv-vllm-unified/bin/python scripts/verify-model-reference.py --channel sparse --output .release-private/sparse-reference.json
+.venv-vllm-unified/bin/python scripts/verify-model-reference.py --channel reranker --output .release-private/bge-reference.json
 ```
 
 这一步在独立验证进程中临时加载一份模型，需为参考运算额外预留 GPU 显存；FastAPI 仍只通过 HTTP 调用模型。

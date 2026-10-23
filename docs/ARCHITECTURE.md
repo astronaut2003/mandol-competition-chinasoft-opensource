@@ -40,6 +40,6 @@
 
 ## 推理部署边界
 
-Web 环境与两个 vLLM 环境各有独立锁文件。Dense/SPLADE 使用 vLLM 0.29.0，BGE 使用 0.25.1；模型权重从指定官方 revision 获取并校验。启动清单与实际 vLLM 配置共同形成元信息，正式客户端再用真实 HTTP 推理验证就绪。缓存布局、进程地址与 GPU 预算不改变模型数值 Profile。
+Web 环境与统一推理环境各有独立锁文件。Dense、SPLADE、BGE 使用 vLLM 0.32.0 / Python 3.12，分别运行独立进程；模型权重从指定官方 revision 获取并校验。启动清单与实际 vLLM 配置共同形成元信息，正式客户端再用真实 HTTP 推理验证就绪。运行时版本参与版本化投影身份，升级时保留原 Canonical 状态与旧 Collection；进程地址和 GPU 预算不改变 Profile。
 
 原生应用和 Linux host-network 应用容器均可访问同一组显式配置的回环 GPU 服务。SQLite 与 Qdrant 继续由每个应用部署独立持有；推理服务不持有用户数据或记忆索引。

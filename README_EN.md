@@ -81,7 +81,7 @@ export CHINASOFT_RERANKER_MANAGED=true
 
 Open **http://127.0.0.1:20600**. SPLADE requires accepting its model access terms and supplying `HF_TOKEN`. The first installation downloads CUDA dependencies and pinned model revisions. Starting the application does not implicitly download or load GPU weights.
 
-Dense, SPLADE, and BGE run as separate vLLM HTTP services. Their dependency locks are isolated from the Web application. See the [GPU deployment guide](docs/INFERENCE.md).
+Dense, SPLADE, and BGE run as separate HTTP services on **vLLM 0.32.0 and Python 3.12**, using one project-local inference environment isolated from the Web application. See the [GPU deployment guide](docs/INFERENCE.md).
 
 ### Start without a GPU
 

@@ -1,5 +1,11 @@
 # 故障排查
 
+## 从旧双版本推理环境升级
+
+当前三个模型统一使用 Python 3.12 / vLLM 0.32.0。执行 `./scripts/inference-setup.sh` 创建 `.venv-vllm-unified`，保留原 `.venv-vllm-029`、`.venv-vllm-025` 供回滚。若配置过 `CHINASOFT_*_VLLM_PYTHON`，请移除旧覆盖或指向新环境。重复启动拒绝接管参数不一致的已有进程时，先正常停止本工程模型，再启动新版。
+
+新版本使用新的版本化 Qdrant Collection，已有记忆由后台补建索引。补建期间查看真实任务和检索状态，不删除 SQLite 或旧 Collection。安装使用 `--no-config` 隔离应用工作区的 protobuf 固定版本；不要通过跳过依赖检查处理冲突。
+
 | 现象 | 检查与处理 |
 |---|---|
 | Docker 不可用/权限拒绝 | 检查 `docker info`、daemon 和当前用户权限；不应全局删除容器或开放 socket |

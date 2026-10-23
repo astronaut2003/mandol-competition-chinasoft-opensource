@@ -6,6 +6,8 @@
 
 默认应用 20600，Qdrant 20633，模型 20631/20636/20632。监听地址为回环；没有自动开放公网或初始化固定密码的步骤。启动脚本会拒绝接管不属于本工程的监听进程。
 
+本机三个模型统一使用 **vLLM 0.32.0 / Python 3.12**，由 `./scripts/inference-setup.sh` 安装到本工程 `.venv-vllm-unified`。更新已有部署时保留 SQLite、旧 Qdrant Collection 和旧环境；新版会在独立版本投影中补建检索索引，迁移及回滚见 [推理部署](INFERENCE.md)。
+
 ## 系统准备
 
 本项目基于 Linux 系统验证，验收环境为 x86_64、Python 3.12.13、Node.js 24.21.0、Docker 29.6.1 和 Compose 插件。不同发行版应按依赖和驱动条件自行验证。Python 声明固定为 3.12；Node.js 建议 22.12 或更新版本。需要可访问 Python/npm 包源、容器镜像源以及用户选择的模型/API 服务。

@@ -4,17 +4,15 @@
 
 ## 独立 GPU 环境
 
-GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型。两套哈希锁对应 198 / 197 个实际安装包，逐包版本、许可元信息与随包声明路径见 [GPU 依赖清单](../deploy/inference/dependencies.json)。
+GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型。三个模型统一使用 Python 3.12 / vLLM 0.32.0，198 个已安装包的完整哈希锁为 `deploy/inference/vllm-unified.lock`，逐包版本与随包许可路径见 [GPU 依赖清单](../deploy/inference/dependencies.json)。
 
-| 组件 | 0.29 环境 / 0.25 环境 | 实际安装包的许可声明 |
+| 组件 | 统一环境 | 实际安装包的许可声明 |
 |---|---|---|
-| vLLM | 0.29.0 / 0.25.1 | Apache-2.0 |
-| PyTorch | 2.13.0 / 2.11.0 | 2.13 包含多组件许可表达式；2.11 标注 BSD-3-Clause；均须保留其内含第三方声明 |
-| Transformers / Tokenizers | 5.20.2 / 0.23.3，两环境相同 | Apache-2.0 |
-| Triton | 3.7.1 / 3.6.0 | MIT |
-| FlashInfer | 0.6.18 / 0.6.13 | Apache-2.0 |
-| NVIDIA CUDA Runtime | 13.0.96，两环境相同 | NVIDIA 专有许可，独立于本项目源码许可 |
-| NVIDIA CUTLASS DSL | 4.6.2 / 4.5.2 | 安装包标注 Other/Proprietary，须遵循随包 LICENSE |
+| vLLM | 0.32.0 | Apache-2.0 |
+| PyTorch | 2.13.0 | 保留安装包内的多组件许可表达式及第三方声明 |
+| Transformers / Tokenizers | 5.19.0 / 0.23.3 | Apache-2.0 |
+| Triton | 3.7.1 | MIT |
+| NVIDIA CUTLASS DSL | 4.8.0 | 遵循安装包随附的 NVIDIA 许可 |
 
 `cuda-toolkit` 元包没有在 wheel METADATA 声明许可，不据此推断其依赖也无条件开放。驱动、CUDA 组件、模型权重及外部 API 分别适用自己的条款；尤其 SPLADE-v3 权重采用 CC-BY-NC-SA-4.0。部署或重新分发依赖镜像时，应保留官方安装包与组件声明。
 
