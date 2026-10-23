@@ -27,9 +27,13 @@ Studio 还提供独立用户与工作区、后台任务、可选联网搜索及�
 
 ## 看看它如何工作
 
-| 来源与版本 | 代码知识 |
-|---|---|
-| ![基础记忆和高阶知识的真实来源关系](docs/assets/memory-provenance.png) | ![公开仓库的源码符号浏览](docs/assets/repository-symbols.png) |
+**来源与版本**
+
+![基础记忆和高阶知识的真实来源关系](docs/assets/memory-provenance.png)
+
+**代码知识**
+
+![公开仓库的源码符号浏览](docs/assets/repository-symbols.png)
 
 ![真实候选、融合、重排序和证据的检索详情](docs/assets/retrieval-trace.png)
 

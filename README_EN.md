@@ -27,9 +27,13 @@ Studio also includes private accounts and workspaces, background jobs, optional 
 
 ## Explore the platform
 
-| Sources and versions | Repository knowledge |
-|---|---|
-| ![Real provenance between basic and higher-level memories](docs/assets/memory-provenance.png) | ![Browsing symbols from a public repository](docs/assets/repository-symbols.png) |
+**Sources and versions**
+
+![Real provenance between basic and higher-level memories](docs/assets/memory-provenance.png)
+
+**Repository knowledge**
+
+![Browsing symbols from a public repository](docs/assets/repository-symbols.png)
 
 ![Actual retrieval candidates, fusion, reranking, and evidence](docs/assets/retrieval-trace.png)
 
