@@ -83,7 +83,10 @@ def run(base,username,password,report):
   check('old_higher_sources_invalidated',bool(affected) and all(not m['eligible'] for m in audited),affected_ids=[m['id'] for m in audited])
   relations=req('GET','/api/memories/'+basic['id']+'/relations',params={'workspace_id':workspace,'state_view':'all'})
   report['revision']={'receipt':revision,'version':new['version'],'affected':audited,'relations':relations,'jobs':jobs}
-  check('basic_to_higher_relations_available',bool(relations))
+  check('basic_to_higher_relations_available',bool(relations.get('items')))
+  history=req('GET','/api/memories/'+basic['id']+'/history',params={'workspace_id':workspace})
+  report['revision']['history']=history
+  check('saved_source_versions_remain_traceable',{basic['version'],new['version']}.issubset({v['version'] for v in history.get('items',[])}))
   final=req('GET','/api/memories/search',params={'workspace_id':workspace,'session_id':second,'retrieval_scope':'conversations','q':query,'limit':8})
   invalid_ids={m['id'] for m in audited}
   check('invalid_higher_excluded_from_search',not any(m['id'] in invalid_ids for m in final['items']))

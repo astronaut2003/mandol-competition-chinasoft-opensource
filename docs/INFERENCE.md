@@ -57,7 +57,7 @@ export CHINASOFT_SPARSE_MANAGED=true
 export CHINASOFT_RERANKER_MANAGED=true
 ./scripts/inference-start.sh
 ./scripts/inference-status.sh
-.venv/bin/python scripts/verify-gpu.py --output .release-private/gpu-verification.json
+./scripts/verify-gpu.sh --output .release-private/gpu-verification.json
 ./scripts/start.sh
 ```
 
@@ -71,7 +71,7 @@ export CHINASOFT_RERANKER_MANAGED=true
 ./scripts/inference-stop.sh
 ```
 
-停止不会删除权重、SQLite、Qdrant 或用户配置。
+停止不会删除权重、SQLite、Qdrant 或用户配置。应用从基础模式切换到完整模式时，使用 `./scripts/stop.sh --api-only` 后再执行 `./scripts/start.sh`，保留已经加载的三个 GPU 服务与 Qdrant。
 
 ## 资源与远端配置
 
@@ -104,3 +104,5 @@ docker compose -f docker-compose.yml -f docker-compose.loopback.yml -p mandol-os
 源码、外部权重、驱动与 API 分别适用各自条件。Qwen/BGE 权重模型卡标注 Apache-2.0；SPLADE-v3 权重标注 **CC-BY-NC-SA-4.0**，不由本项目 Apache 许可重新授权。仓库与应用镜像均不包含模型权重。
 
 在同一机器复验多个干净检出时，可显式设置 `MANDOL_DOWNLOAD_CACHE_DIR` 复用本工程已从公开源下载的包缓存，`CHINASOFT_MODEL_CACHE` 复用已授权、固定哈希的公共模型缓存。每个检出仍创建自己的推理虚拟环境和进程清单，不复制已安装环境，也不读取私有工程。
+
+模型进程的 VLLM、Triton、FlashInfer、CUDA、PyTorch 扩展与 XDG 缓存均显式放在本检出的 `.runtime/vllm-gpu/cache/<channel>`；参考数值验证使用 `.runtime/reference/<channel>`。不修改全局驱动、其他工程的环境或编译缓存。

@@ -120,26 +120,30 @@ def start(s,basic):
     raise RuntimeError('API did not become healthy; see .runtime/api.log. The owned process is retained for diagnosis.')
 
 
-def stop(s):
+def stop(s,api_only=False):
     r=owned()
     if r:
         os.killpg(r['pid'],signal.SIGTERM);deadline=time.monotonic()+120
         while process(r) and time.monotonic()<deadline:time.sleep(.25)
         if process(r):raise RuntimeError('API is still draining. No force-kill sent; check the owned log.')
         RECORD.unlink(missing_ok=True)
+    if api_only:
+        print('Stopped only the owned API; Qdrant, model services and persistent data were retained.')
+        return
     subprocess.run([sys.executable,str(ROOT/'scripts/chinasoft_vllm.py'),'stop'],check=True,cwd=ROOT)
     subprocess.run(compose('down','--timeout','45'),check=True,cwd=ROOT)
     print('Stopped only this project. Persistent volumes, SQLite and uploads were retained.')
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['init','start','status','stop']);parser.add_argument('--basic',action='store_true');a=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['init','start','status','stop']);parser.add_argument('--basic',action='store_true');parser.add_argument('--api-only',action='store_true',help='Stop only the owned API, keeping Qdrant and GPU services');a=parser.parse_args()
+    if a.api_only and a.action!='stop':parser.error('--api-only is only available for stop')
     RUN.mkdir(exist_ok=True,mode=0o700);s=Settings()
     with (RUN/'lifecycle.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
         if a.action=='init':init(s)
         elif a.action=='start':start(s,a.basic)
-        elif a.action=='stop':stop(s)
+        elif a.action=='stop':stop(s,a.api_only)
         else:status(s)
 
 if __name__=='__main__':

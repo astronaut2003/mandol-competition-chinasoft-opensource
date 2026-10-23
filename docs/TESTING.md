@@ -44,7 +44,7 @@ MANDOL_E2E_USERNAME=<你的账号> MANDOL_E2E_PASSWORD_FILE=<0600密码文件> n
 三个服务启动后执行正式 HTTP 客户端测试：
 
 ```bash
-.venv/bin/python scripts/verify-gpu.py --samples 12 --output .release-private/gpu-http.json
+./scripts/verify-gpu.sh --samples 12 --output .release-private/gpu-http.json
 ```
 
 默认必须三个通道全部通过。`--channel dense` 等选项仅用于逐通道诊断，单通道 PASS 不代表完整检索。结果包含实际 metadata、批量与重复误差、稀疏非零数量、BGE 排序，以及顺序/并发 2 的原始测量和 P50/P95。
@@ -67,3 +67,5 @@ MANDOL_E2E_USERNAME=<你的账号> MANDOL_E2E_PASSWORD_FILE=<0600密码文件> n
 ```
 
 该示例保留自己的工作区用于查看结果，不清理已有账号数据。服务或配方不合格会失败，不能把基础模式的词法召回当作三路成功。重启检查应比较原工作区与 Source UID，再执行真实查询；不要用重新生成数据代替持久化验证。
+
+`./scripts/stop.sh --api-only` 仅停止所有权验证通过的应用进程，保留模型和 Qdrant，适合验证应用重启恢复；不带该选项的 stop 仍停止本项目专属的完整服务栈。

@@ -120,10 +120,16 @@ def start_one(channel):
     artifact=verify_artifact(d['cache'],channel)
     cmd,key_env=command(channel,d)
     environment=dict(os.environ)
+    compilation=RUN/'cache'/channel
+    compilation.mkdir(parents=True,exist_ok=True)
     environment.update(CUDA_VISIBLE_DEVICES=d['gpu'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',
-        VLLM_NO_USAGE_STATS='1',VLLM_USE_V2_MODEL_RUNNER='0',VLLM_SERVER_DEV_MODE='0',OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',
+        VLLM_NO_USAGE_STATS='1',VLLM_USE_V2_MODEL_RUNNER='0',VLLM_SERVER_DEV_MODE='0',VLLM_HOST_IP='127.0.0.1',OMP_NUM_THREADS='2',MKL_NUM_THREADS='2',
         OPENBLAS_NUM_THREADS='2',VLLM_RPC_BASE_PATH='/tmp',VLLM_CACHE_ROOT=str(RUN/'cache'/channel),
-        HF_HUB_CACHE=d['cache'],PYTHONUNBUFFERED='1')
+        HF_HUB_CACHE=d['cache'],HF_HOME=str(Path(d['cache']).parent),
+        XDG_CACHE_HOME=str(compilation/'xdg'),TRITON_CACHE_DIR=str(compilation/'triton'),
+        FLASHINFER_WORKSPACE_BASE=str(compilation/'flashinfer'),
+        CUDA_CACHE_PATH=str(compilation/'cuda'),TORCH_EXTENSIONS_DIR=str(compilation/'extensions'),
+        TORCHINDUCTOR_CACHE_DIR=str(compilation/'inductor'),PYTHONUNBUFFERED='1')
     environment['PYTHONPATH']=str(ROOT/'services')
     environment['CHINASOFT_VLLM_MANIFEST_FILE']=str(RUN/(channel+'.json'))
     if key_env:environment['VLLM_API_KEY']=os.getenv(key_env)

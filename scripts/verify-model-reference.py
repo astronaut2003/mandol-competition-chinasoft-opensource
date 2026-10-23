@@ -12,6 +12,11 @@ from mandol_competition.chinasoft.retrieval_contract import MODELS,cache_snapsho
 from mandol_competition.chinasoft.config import Settings
 
 def verify(channel):
+ os.environ.setdefault('CUDA_VISIBLE_DEVICES',os.environ.get('CHINASOFT_'+channel.upper()+'_GPU','0'))
+ compilation=ROOT/'.runtime/reference'/channel;compilation.mkdir(parents=True,exist_ok=True)
+ for key,folder in [('XDG_CACHE_HOME','xdg'),('TRITON_CACHE_DIR','triton'),('CUDA_CACHE_PATH','cuda'),('TORCH_EXTENSIONS_DIR','extensions'),('TORCHINDUCTOR_CACHE_DIR','inductor')]:
+  os.environ[key]=str(compilation/folder)
+ os.environ['FLASHINFER_WORKSPACE_BASE']=str(compilation/'flashinfer')
  import torch
  import torch.nn.functional as F
  from transformers import AutoTokenizer,AutoModel,AutoModelForMaskedLM,AutoModelForSequenceClassification
@@ -33,7 +38,9 @@ def verify(channel):
   inputs=tokenizer(docs,padding=True,truncation=True,max_length=4096,return_tensors='pt').to('cuda')
   with torch.inference_mode():
    hidden=net(**inputs).last_hidden_state
-   indexes=inputs['attention_mask'].sum(dim=1)-1
+   # LAST means the final real token for either left or right padding.
+   mask=inputs['attention_mask']
+   indexes=mask.shape[1]-1-mask.flip(1).argmax(dim=1)
    reference=F.normalize(hidden[torch.arange(len(docs),device='cuda'),indexes].float(),p=2,dim=1).cpu()
   raw=request('/v1/embeddings',{'model':model['alias'],'input':docs,'encoding_format':'float','truncate_prompt_tokens':4096,'truncation_side':'right'})
   actual=torch.tensor([x['embedding'] for x in sorted(raw['data'],key=lambda x:x['index'])])

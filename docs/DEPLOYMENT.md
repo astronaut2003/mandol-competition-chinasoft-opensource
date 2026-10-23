@@ -44,7 +44,12 @@ cd mandol
 
 当前进程模型是 **一个 Uvicorn 进程 + 内置四类 Worker**，不是单独 Worker 容器。不要增加 `--workers` 数量来扩容；当前调度和任务恢复应先通过专门验证。
 
-没有 GPU 依赖时，可运行 `./scripts/start.sh --basic`，明确启用降级检查。状态页会报告缺失依赖，索引和高阶任务可能等待或失败。模型可用后应停止自己的应用，再以完整配置启动；不能假称历史失败任务已经完成。
+没有 GPU 依赖时，可运行 `./scripts/start.sh --basic`，明确启用降级检查。状态页会报告缺失依赖，索引和高阶任务可能等待或失败。模型可用后，用以下命令只重启应用，保留已加载的模型与 Qdrant；历史失败任务仍需依据后台任务状态检查或重试：
+
+```bash
+./scripts/stop.sh --api-only
+./scripts/start.sh
+```
 
 ## 手动安装
 
@@ -85,7 +90,7 @@ export CHINASOFT_SPARSE_MANAGED=true
 export CHINASOFT_RERANKER_MANAGED=true
 ./scripts/inference-start.sh
 ./scripts/inference-status.sh
-.venv/bin/python scripts/verify-gpu.py
+./scripts/verify-gpu.sh
 ./scripts/start.sh
 ```
 

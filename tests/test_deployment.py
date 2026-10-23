@@ -18,6 +18,13 @@ def test_reused_pid_is_not_owned():
  record={'pid':os.getpid(),'ticks':'0','boot':'wrong'}
  assert not module.process(record)
 
+def test_api_only_stop_preserves_inference_and_database_services(monkeypatch):
+ from mandol_competition.chinasoft.config import Settings
+ monkeypatch.setattr(module,'owned',lambda:None)
+ def forbidden(*args,**kwargs):raise AssertionError('API-only stop must not invoke model or Docker lifecycle commands')
+ monkeypatch.setattr(module.subprocess,'run',forbidden)
+ module.stop(Settings(),api_only=True)
+
 def test_explicit_environment_wins_without_reading_private_config():
  result=subprocess.run(['bash','-c','source scripts/_common.sh; printf "%s" "$CHINASOFT_PORT"'],cwd=ROOT,env={**os.environ,'CHINASOFT_PORT':'20777'},text=True,capture_output=True,check=True)
  assert result.stdout=='20777'
