@@ -2,6 +2,22 @@
 
 本表记录本次独立安装解析的 Python wheel METADATA 和 npm 锁文件 license 字段，包含开发依赖。第三方源码和权重未重新授权；随安装包分发的 notices 仍应保留。原生扩展和 NumPy 等二进制包可能另含组件声明，实际分发 wheel/镜像时应保留其 LICENSE 文件。
 
+## 独立 GPU 环境
+
+GPU 依赖不安装到 Web 环境，也不随 Git 仓库分发 wheel 或模型。两套哈希锁对应 198 / 197 个实际安装包，逐包版本、许可元信息与随包声明路径见 [GPU 依赖清单](../deploy/inference/dependencies.json)。
+
+| 组件 | 0.29 环境 / 0.25 环境 | 实际安装包的许可声明 |
+|---|---|---|
+| vLLM | 0.29.0 / 0.25.1 | Apache-2.0 |
+| PyTorch | 2.13.0 / 2.11.0 | 2.13 包含多组件许可表达式；2.11 标注 BSD-3-Clause；均须保留其内含第三方声明 |
+| Transformers / Tokenizers | 5.20.2 / 0.23.3，两环境相同 | Apache-2.0 |
+| Triton | 3.7.1 / 3.6.0 | MIT |
+| FlashInfer | 0.6.18 / 0.6.13 | Apache-2.0 |
+| NVIDIA CUDA Runtime | 13.0.96，两环境相同 | NVIDIA 专有许可，独立于本项目源码许可 |
+| NVIDIA CUTLASS DSL | 4.6.2 / 4.5.2 | 安装包标注 Other/Proprietary，须遵循随包 LICENSE |
+
+`cuda-toolkit` 元包没有在 wheel METADATA 声明许可，不据此推断其依赖也无条件开放。驱动、CUDA 组件、模型权重及外部 API 分别适用自己的条款；尤其 SPLADE-v3 权重采用 CC-BY-NC-SA-4.0。部署或重新分发依赖镜像时，应保留官方安装包与组件声明。
+
 ## Python
 
 | 包 | 版本 | 安装包许可声明 |

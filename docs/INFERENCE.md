@@ -18,6 +18,17 @@ Mandol 在独立 HTTP 进程中运行模型，FastAPI 只调用端点。三个�
 
 安装器会实际执行 CUDA 张量运算。成功安装依赖不能替代模型验证。设备显存需求包含权重、CUDA 上下文、运行时与激活；本项目不承诺所有低显存 GPU 均可运行三个服务。启动前检查 GPU_MEMORY 总预算与额外 2048 MiB 余量，资源不足时报告诊断，保留其他项目进程。
 
+### 已验证的运行组合
+
+2026-10-23 基于 Linux 系统验证，在 RTX 5090 Laptop（24463 MiB）、NVIDIA Driver 617.42 环境中完成三服务真实 HTTP 推理，并与同一权重的 Transformers CUDA 输出对照。应用和模型环境均为 Python 3.12.13：
+
+| 用途 | vLLM | PyTorch | CUDA runtime | protobuf |
+|---|---|---|---|---|
+| Dense / SPLADE | 0.29.0 | 2.13.0+cu130 | 13.0 | 6.33.6 |
+| BGE Reranker | 0.25.1 | 2.11.0+cu130 | 13.0 | 7.36.2 |
+
+CUDA runtime 以 `torch.version.cuda` 的实际值为准。其他 GPU 或驱动组合应运行安装器的 CUDA 检查和下面的真实推理验证；模型身份和数值配方仍需保持一致。
+
 ## 1. 安装独立环境
 
 ```bash
