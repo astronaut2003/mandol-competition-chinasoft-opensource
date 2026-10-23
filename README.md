@@ -35,6 +35,8 @@ Studio 还提供独立用户与工作区、后台任务、可选联网搜索及�
 
 ![公开仓库的源码符号浏览](docs/assets/repository-symbols.png)
 
+**检索详情**
+
 ![真实候选、融合、重排序和证据的检索详情](docs/assets/retrieval-trace.png)
 
 以上均为本开源工程运行截图，使用合成账号与演示资料。图中的聚合不会合并数据库里的实际记忆身份。

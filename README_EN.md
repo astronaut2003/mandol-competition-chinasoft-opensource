@@ -35,6 +35,8 @@ Studio also includes private accounts and workspaces, background jobs, optional 
 
 ![Browsing symbols from a public repository](docs/assets/repository-symbols.png)
 
+**Retrieval details**
+
 ![Actual retrieval candidates, fusion, reranking, and evidence](docs/assets/retrieval-trace.png)
 
 These screenshots come from this open-source application using synthetic accounts and demo data. Visual grouping preserves the identities of the underlying records.
