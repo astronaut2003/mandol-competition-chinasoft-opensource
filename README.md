@@ -1,4 +1,4 @@
-# Mandol
+# Mandol Platform
 
 **面向智能体的跨任务长期记忆平台**
 
